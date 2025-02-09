@@ -4,28 +4,52 @@ import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { Wallet, HDNodeWallet } from "ethers";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import { UnsafeBurnerWalletAdapter } from "@solana/wallet-adapter-wallets";
+import {
+  WalletModalProvider,
+  WalletDisconnectButton,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
+import { clusterApiUrl } from "@solana/web3.js";
+import Airdrop from './airdrop';
+
+// Default styles that can be overridden by your app
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 const App = () => {
   const [mnemonic, setMnemonic] = useState("");
 
   return (
-    <div>
-      <h1>Creating a Web Based Wallet</h1>
-      {
-        mnemonic
-      }
-      <button
-        onClick={async function () {
-          const mn = await generateMnemonic();
-          setMnemonic(mn);
-        }}
-      >
-        Create Seed Phrase
-      </button>
+    <ConnectionProvider endpoint={"https://api.devnet.solana.com"}>
+      <WalletProvider wallets={[]} autoConnect>
+        <WalletModalProvider>
+          <WalletMultiButton></WalletMultiButton>
+          <WalletDisconnectButton></WalletDisconnectButton>
+          <h1>Creating a Web Based Wallet</h1>
+          <span>Menemonic is {mnemonic}</span>
 
-      <SolanaWallet mnemonic={mnemonic} />
-      <ETHWallet mnemonic={mnemonic} />
-    </div>
+
+          <div>
+
+          <h2>Airdrop</h2>
+
+          <Airdrop/>
+          </div>
+          <button
+            onClick={async function () {
+              const mn = await generateMnemonic();
+              setMnemonic(mn);
+            }}
+          >
+            Create Seed Phrase
+          </button>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }
 
